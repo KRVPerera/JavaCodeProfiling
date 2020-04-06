@@ -32,13 +32,43 @@
 package org.krv.ballerinalang;
 
 import org.openjdk.jmh.annotations.Benchmark;
+import org.openjdk.jmh.annotations.BenchmarkMode;
+import org.openjdk.jmh.annotations.Mode;
+import org.openjdk.jmh.annotations.OperationsPerInvocation;
+import org.openjdk.jmh.annotations.OutputTimeUnit;
 
+import java.util.ArrayList;
+import java.util.List;
+import java.util.concurrent.TimeUnit;
+
+@OutputTimeUnit(TimeUnit.NANOSECONDS)
+@BenchmarkMode(Mode.AverageTime)
+@OperationsPerInvocation(MyBenchmark.N)
 public class MyBenchmark {
 
-    @Benchmark
-    public void testMethod() {
-        // This is a demo/sample template for building your JMH benchmarks. Edit as needed.
-        // Put your benchmark code here.
+    public static final int N = 1000000000;
+
+    static List<Integer> sourceList = new ArrayList<>();
+
+    static {
+        for (int i = 0; i < N; i++) {
+            sourceList.add(i);
+        }
     }
 
+    @Benchmark
+    public void testforEachMethod() {
+        sourceList.forEach(this::simpleDouble);
+    }
+
+    @Benchmark
+    public void testSimpleForEachMethod() {
+        for (int number : sourceList) {
+            simpleDouble(number);
+        }
+    }
+
+    private void simpleDouble(int num) {
+        int y = num * 2;
+    }
 }
