@@ -46,7 +46,7 @@ import java.util.concurrent.TimeUnit;
 @OperationsPerInvocation(MyBenchmark.N)
 public class MyBenchmark {
 
-    public static final int N = 1000000000;
+    public static final int N = 100000;
 
     static List<Integer> sourceList = new ArrayList<>();
 
