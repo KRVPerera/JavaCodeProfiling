@@ -51,7 +51,6 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Random;
 import java.util.Set;
-import java.util.TreeSet;
 import java.util.concurrent.TimeUnit;
 
 @OutputTimeUnit(TimeUnit.NANOSECONDS)
@@ -60,10 +59,10 @@ import java.util.concurrent.TimeUnit;
 @State(Scope.Thread)
 public class MyBenchmark {
 
-    public static final int N = 100000000;
+    public static final int N = 1000000;
 
     static Set<Pair<Integer, Integer>> intPairSet = new HashSet<>();
-    static Set<Pair<Integer, Integer>> intPairTreeSet = new TreeSet<>();
+    //    static Set<Pair<Integer, Integer>> intPairTreeSet = new TreeSet<>();
     static List<Pair<Integer, Integer>> searchPairs = new ArrayList<>(N);
     static Random rand = new Random();
 
@@ -82,13 +81,13 @@ public class MyBenchmark {
     @TearDown(Level.Iteration)
     public void check() {
         intPairSet.clear();
-        intPairTreeSet.clear();
+//        intPairTreeSet.clear();
         for (int i = 0; i < N; i++) {
             int randomIntA = rand.nextInt(N / 1000);
             int randomIntB = rand.nextInt(N / 1000);
             Pair pair = new Pair<>(randomIntA, randomIntB);
             intPairSet.add(pair);
-            intPairTreeSet.add(pair);
+//            intPairTreeSet.add(pair);
         }
     }
 
@@ -121,22 +120,22 @@ public class MyBenchmark {
         }
     }
 
-    @Benchmark
-    public void testTreeSetContainsAndAdd() {
-        for (Pair numPair : searchPairs) {
-            if (intPairTreeSet.contains(numPair)) {
-                continue;
-            }
-            intPairTreeSet.add(numPair);
-        }
-    }
-
-    @Benchmark
-    public void testTreeSetOnlyAdd() {
-        for (Pair numPair : searchPairs) {
-            if (!intPairTreeSet.add(numPair)) {
-                continue;
-            }
-        }
-    }
+//    @Benchmark
+//    public void testTreeSetContainsAndAdd() {
+//        for (Pair numPair : searchPairs) {
+//            if (intPairTreeSet.contains(numPair)) {
+//                continue;
+//            }
+//            intPairTreeSet.add(numPair);
+//        }
+//    }
+//
+//    @Benchmark
+//    public void testTreeSetOnlyAdd() {
+//        for (Pair numPair : searchPairs) {
+//            if (!intPairTreeSet.add(numPair)) {
+//                continue;
+//            }
+//        }
+//    }
 }
