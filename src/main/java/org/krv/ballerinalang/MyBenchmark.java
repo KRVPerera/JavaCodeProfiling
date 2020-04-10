@@ -31,44 +31,101 @@
 
 package org.krv.ballerinalang;
 
+import org.apache.commons.math3.util.Pair;
 import org.openjdk.jmh.annotations.Benchmark;
 import org.openjdk.jmh.annotations.BenchmarkMode;
+import org.openjdk.jmh.annotations.Level;
 import org.openjdk.jmh.annotations.Mode;
 import org.openjdk.jmh.annotations.OperationsPerInvocation;
 import org.openjdk.jmh.annotations.OutputTimeUnit;
+import org.openjdk.jmh.annotations.Scope;
+import org.openjdk.jmh.annotations.State;
+import org.openjdk.jmh.annotations.TearDown;
+import org.openjdk.jmh.runner.Runner;
+import org.openjdk.jmh.runner.RunnerException;
+import org.openjdk.jmh.runner.options.Options;
+import org.openjdk.jmh.runner.options.OptionsBuilder;
 
-import java.util.ArrayList;
-import java.util.List;
+import java.util.HashSet;
+import java.util.Random;
+import java.util.Set;
 import java.util.concurrent.TimeUnit;
 
 @OutputTimeUnit(TimeUnit.NANOSECONDS)
 @BenchmarkMode(Mode.AverageTime)
 @OperationsPerInvocation(MyBenchmark.N)
+@State(Scope.Thread)
 public class MyBenchmark {
 
-    public static final int N = 1000000;
+    public static final int N = 10000000;
 
-    static List<Integer> sourceList = new ArrayList<>();
+    //    static List<Integer> sourceList = new ArrayList<>();
+    static Set<Pair<Integer, Integer>> intPairSet = new HashSet<>();
+    static Random rand = new Random();
 
-    static {
+//    static {
+//        for (int i = 0; i < N; i++) {
+//            sourceList.add(i);
+//        }
+//    }
+
+    public static void main(String[] args) throws RunnerException {
+        Options opt = new OptionsBuilder()
+                .include(MyBenchmark.class.getSimpleName())
+                .forks(1)
+                .jvmArgs("-ea")
+                .shouldFailOnError(false) // switch to "true" to fail the complete run
+                .build();
+
+        new Runner(opt).run();
+    }
+
+//    @Benchmark
+//    public void testforEachMethod() {
+//        sourceList.forEach(this::simpleDouble);
+//    }
+//
+//    @Benchmark
+//    public void testSimpleForEachMethod() {
+//        for (int number : sourceList) {
+//            simpleDouble(number);
+//        }
+//    }
+
+    @TearDown(Level.Iteration)
+    public void check() {
+        intPairSet.clear();
+        int randomIntA = rand.nextInt(N / 10);
+        int randomIntB = rand.nextInt(N / 10);
+
         for (int i = 0; i < N; i++) {
-            sourceList.add(i);
+            intPairSet.add(new Pair<>(randomIntA, randomIntB));
         }
     }
 
+    // TODO: extract out random pair generation
     @Benchmark
-    public void testforEachMethod() {
-        sourceList.forEach(this::simpleDouble);
-    }
-
-    @Benchmark
-    public void testSimpleForEachMethod() {
-        for (int number : sourceList) {
-            simpleDouble(number);
+    public void testSearchAndInsert() {
+        int randomIntA = rand.nextInt(N / 10);
+        int randomIntB = rand.nextInt(N / 10);
+        Pair pair = new Pair(randomIntA, randomIntB);
+        if (intPairSet.contains(pair)) {
+            return;
         }
+        intPairSet.add(pair);
     }
 
     private void simpleDouble(int num) {
         int y = num * 2;
+    }
+
+    @Benchmark
+    public void testOnlyInsert() {
+        int randomIntA = rand.nextInt(N / 10);
+        int randomIntB = rand.nextInt(N / 10);
+        Pair pair = new Pair(randomIntA, randomIntB);
+        if (!intPairSet.add(pair)) {
+            return;
+        }
     }
 }
