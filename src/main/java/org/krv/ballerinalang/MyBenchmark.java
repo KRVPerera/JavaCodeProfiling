@@ -46,9 +46,12 @@ import org.openjdk.jmh.runner.RunnerException;
 import org.openjdk.jmh.runner.options.Options;
 import org.openjdk.jmh.runner.options.OptionsBuilder;
 
+import java.util.ArrayList;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Random;
 import java.util.Set;
+import java.util.TreeSet;
 import java.util.concurrent.TimeUnit;
 
 @OutputTimeUnit(TimeUnit.NANOSECONDS)
@@ -57,17 +60,13 @@ import java.util.concurrent.TimeUnit;
 @State(Scope.Thread)
 public class MyBenchmark {
 
-    public static final int N = 1000000;
+    public static final int N = 100000000;
 
-    //    static List<Integer> sourceList = new ArrayList<>();
     static Set<Pair<Integer, Integer>> intPairSet = new HashSet<>();
+    static Set<Pair<Integer, Integer>> intPairTreeSet = new TreeSet<>();
+    static List<Pair<Integer, Integer>> searchPairs = new ArrayList<>(N);
     static Random rand = new Random();
 
-//    static {
-//        for (int i = 0; i < N; i++) {
-//            sourceList.add(i);
-//        }
-//    }
 
     public static void main(String[] args) throws RunnerException {
         Options opt = new OptionsBuilder()
@@ -80,54 +79,63 @@ public class MyBenchmark {
         new Runner(opt).run();
     }
 
-//    @Benchmark
-//    public void testforEachMethod() {
-//        sourceList.forEach(this::simpleDouble);
-//    }
-//
-//    @Benchmark
-//    public void testSimpleForEachMethod() {
-//        for (int number : sourceList) {
-//            simpleDouble(number);
-//        }
-//    }
-
     @TearDown(Level.Iteration)
     public void check() {
         intPairSet.clear();
+        intPairTreeSet.clear();
         for (int i = 0; i < N; i++) {
             int randomIntA = rand.nextInt(N / 1000);
             int randomIntB = rand.nextInt(N / 1000);
-            intPairSet.add(new Pair<>(randomIntA, randomIntB));
-        }
-    }
-
-    // TODO: extract out random pair generation
-    @Benchmark
-    public void testSearchAndInsert() {
-        for (int i = 0; i < N / 10; i++) {
-            int randomIntA = rand.nextInt(N / 10);
-            int randomIntB = rand.nextInt(N / 10);
-            Pair pair = new Pair(randomIntA, randomIntB);
-            if (intPairSet.contains(pair)) {
-                return;
-            }
+            Pair pair = new Pair<>(randomIntA, randomIntB);
             intPairSet.add(pair);
+            intPairTreeSet.add(pair);
         }
     }
 
-//    private void simpleDouble(int num) {
-//        int y = num * 2;
-//    }
+    @TearDown(Level.Invocation)
+    public void generateSearchNumbers() {
+        searchPairs.clear();
+        for (int i = 0; i < N; i++) {
+            int randomIntA = rand.nextInt(N);
+            int randomIntB = rand.nextInt(N);
+            searchPairs.add(new Pair<>(randomIntA, randomIntB));
+        }
+    }
 
     @Benchmark
-    public void testOnlyInsert() {
-        for (int i = 0; i < N / 10; i++) {
-            int randomIntA = rand.nextInt(N / 10);
-            int randomIntB = rand.nextInt(N / 10);
-            Pair pair = new Pair(randomIntA, randomIntB);
-            if (!intPairSet.add(pair)) {
-                return;
+    public void testHashSetContainsAndAdd() {
+        for (Pair numPair : searchPairs) {
+            if (intPairSet.contains(numPair)) {
+                continue;
+            }
+            intPairSet.add(numPair);
+        }
+    }
+
+    @Benchmark
+    public void testHashSetOnlyAdd() {
+        for (Pair numPair : searchPairs) {
+            if (!intPairSet.add(numPair)) {
+                continue;
+            }
+        }
+    }
+
+    @Benchmark
+    public void testTreeSetContainsAndAdd() {
+        for (Pair numPair : searchPairs) {
+            if (intPairTreeSet.contains(numPair)) {
+                continue;
+            }
+            intPairTreeSet.add(numPair);
+        }
+    }
+
+    @Benchmark
+    public void testTreeSetOnlyAdd() {
+        for (Pair numPair : searchPairs) {
+            if (!intPairTreeSet.add(numPair)) {
+                continue;
             }
         }
     }
