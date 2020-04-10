@@ -57,7 +57,7 @@ import java.util.concurrent.TimeUnit;
 @State(Scope.Thread)
 public class MyBenchmark {
 
-    public static final int N = 10000;
+    public static final int N = 1000000;
 
     //    static List<Integer> sourceList = new ArrayList<>();
     static Set<Pair<Integer, Integer>> intPairSet = new HashSet<>();
@@ -95,10 +95,9 @@ public class MyBenchmark {
     @TearDown(Level.Iteration)
     public void check() {
         intPairSet.clear();
-        int randomIntA = rand.nextInt(N / 10);
-        int randomIntB = rand.nextInt(N / 10);
-
         for (int i = 0; i < N; i++) {
+            int randomIntA = rand.nextInt(N / 1000);
+            int randomIntB = rand.nextInt(N / 1000);
             intPairSet.add(new Pair<>(randomIntA, randomIntB));
         }
     }
