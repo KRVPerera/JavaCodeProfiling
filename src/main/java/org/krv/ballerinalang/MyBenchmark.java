@@ -57,7 +57,7 @@ import java.util.concurrent.TimeUnit;
 @State(Scope.Thread)
 public class MyBenchmark {
 
-    public static final int N = 10000000;
+    public static final int N = 10000;
 
     //    static List<Integer> sourceList = new ArrayList<>();
     static Set<Pair<Integer, Integer>> intPairSet = new HashSet<>();
@@ -106,26 +106,30 @@ public class MyBenchmark {
     // TODO: extract out random pair generation
     @Benchmark
     public void testSearchAndInsert() {
-        int randomIntA = rand.nextInt(N / 10);
-        int randomIntB = rand.nextInt(N / 10);
-        Pair pair = new Pair(randomIntA, randomIntB);
-        if (intPairSet.contains(pair)) {
-            return;
+        for (int i = 0; i < N / 10; i++) {
+            int randomIntA = rand.nextInt(N / 10);
+            int randomIntB = rand.nextInt(N / 10);
+            Pair pair = new Pair(randomIntA, randomIntB);
+            if (intPairSet.contains(pair)) {
+                return;
+            }
+            intPairSet.add(pair);
         }
-        intPairSet.add(pair);
     }
 
-    private void simpleDouble(int num) {
-        int y = num * 2;
-    }
+//    private void simpleDouble(int num) {
+//        int y = num * 2;
+//    }
 
     @Benchmark
     public void testOnlyInsert() {
-        int randomIntA = rand.nextInt(N / 10);
-        int randomIntB = rand.nextInt(N / 10);
-        Pair pair = new Pair(randomIntA, randomIntB);
-        if (!intPairSet.add(pair)) {
-            return;
+        for (int i = 0; i < N / 10; i++) {
+            int randomIntA = rand.nextInt(N / 10);
+            int randomIntB = rand.nextInt(N / 10);
+            Pair pair = new Pair(randomIntA, randomIntB);
+            if (!intPairSet.add(pair)) {
+                return;
+            }
         }
     }
 }
